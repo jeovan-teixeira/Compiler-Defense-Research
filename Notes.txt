@@ -1,0 +1,28 @@
+Compiler Defense Configs
+
+Baseline
+gcc -O0 -g -fno-stack-protector -no-pie -z execstack vulnerable_server.c -o server_baseline
+
+Stack Canary Only
+gcc -O0 -g -fstack-protector-strong -no-pie -z execstack vulnerable_server.c -o server_canary
+
+NX Only
+gcc -O0 -g -fno-stack-protector -no-pie -z noexecstack vulnerable_server.c -o server_nx
+
+PIE Only
+gcc -O0 -g -fno-stack-protector -fPIE -pie -z execstack vulnerable_server.c -o server_pie
+
+_FORTIFY_SOURCE Only
+gcc -O1 -g -D_FORTIFY_SOURCE=1 -fno-stack-protector -no-pie -z execstack vulnerable_server.c -o server_fortified_1
+gcc -O1 -g -D_FORTIFY_SOURCE=2 -fno-stack-protector -no-pie -z execstack vulnerable_server.c -o server_fortified_2
+
+RELRO Only
+gcc -O0 -g -Wl,-z,relro,-z,now -fno-stack-protector -no-pie -z execstack vulnerable_server.c -o server_relro
+
+
+All
+
+
+python3 -c 'print("A" * 256)' | nc 169.254.125.100 4444
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("<I", 268435456)); sys.stdout.buffer.write(b"AAAA")' | nc 169.254.125.100 4444
+
