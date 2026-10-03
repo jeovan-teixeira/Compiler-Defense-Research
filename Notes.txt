@@ -1,28 +1,27 @@
 Compiler Defense Configs
 
-Baseline
-gcc -O0 -g -fno-stack-protector -no-pie -z execstack vulnerable_server.c -o server_baseline
+No Flags
+gcc vulnerable_server.c -o server_noFlags
+
+Baseline (No Hardening)
+gcc -O0 -fno-stack-protector -no-pie -Wl,-z,execstack -Wl,-z,norelro vulnerable_server.c -o server_baseline
 
 Stack Canary Only
-gcc -O0 -g -fstack-protector-strong -no-pie -z execstack vulnerable_server.c -o server_canary
+gcc -O0 -fstack-protector-strong -no-pie -Wl,-z,execstack -Wl,-z,norelro vulnerable_server.c -o server_canary
 
 NX Only
-gcc -O0 -g -fno-stack-protector -no-pie -z noexecstack vulnerable_server.c -o server_nx
+gcc -O0 -fno-stack-protector -no-pie -Wl,-z,noexecstack -Wl,-z,norelro vulnerable_server.c -o server_nx
 
-PIE Only
-gcc -O0 -g -fno-stack-protector -fPIE -pie -z execstack vulnerable_server.c -o server_pie
+PIE + NX
+gcc -O0 -fno-stack-protector -fPIE -pie -Wl,-z,noexecstack -Wl,-z,norelro vulnerable_server.c -o server_pie_nx
 
-_FORTIFY_SOURCE Only
-gcc -O1 -g -D_FORTIFY_SOURCE=1 -fno-stack-protector -no-pie -z execstack vulnerable_server.c -o server_fortified_1
-gcc -O1 -g -D_FORTIFY_SOURCE=2 -fno-stack-protector -no-pie -z execstack vulnerable_server.c -o server_fortified_2
+Canary + PIE + NX + RELRO
+gcc -O0 -fstack-protector-strong -fPIE -pie -Wl,-z,noexecstack -Wl,-z,relro,-z,now vulnerable_server.c -o server_hardened
 
-RELRO Only
-gcc -O0 -g -Wl,-z,relro,-z,now -fno-stack-protector -no-pie -z execstack vulnerable_server.c -o server_relro
-
-
-All
+Canary + PIE + NX + RELRO + _FORTIFY_SOURCE
+gcc -O2 -fstack-protector-strong -fPIE -pie -Wl,-z,noexecstack -Wl,-z,relro,-z,now -D_FORTIFY_SOURCE=2 vulnerable_server.c -o server_full
 
 
+Some Attack Commands
 python3 -c 'print("A" * 256)' | nc 169.254.125.100 4444
 python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("<I", 268435456)); sys.stdout.buffer.write(b"AAAA")' | nc 169.254.125.100 4444
-

@@ -9,6 +9,7 @@
 #define ITEM_SIZE 16
 int exploit;
 
+void handle_client(int client_fd);
 void client_stackOverflow(int client_fd);
 void client_formatString(int client_fd);
 void client_heapOverflow(int client_fd);
@@ -20,11 +21,11 @@ int main(int argc, char* argv[])
 	if (argv[1] != NULL)
 	{
 		exploit = atoi(argv[1]);
-		exploit = (exploit <= 0  || exploit >= 5) ? 1 : exploit;
+		exploit = (exploit <= -1  || exploit >= 5) ? 1 : exploit;
 	}
 	else	
 	{
-		exploit = 1;
+		exploit = 0;
 	}
 
 	// Socket file descriptors
@@ -70,7 +71,10 @@ int main(int argc, char* argv[])
 	}
 
 	printf("Listening on TCP port %d...\n", PORT);
-	printf("Exploit #%d\n", exploit);
+	if (exploit != 0)
+		printf("Exploit #%d\n", exploit);
+	else
+		printf("No Exploit\n");
 
 	while (1)
 	{
@@ -85,6 +89,10 @@ int main(int argc, char* argv[])
 
 		switch (exploit)
 		{
+			case 0:
+				handle_client(client_fd);
+				break;
+				
 			case 1:
 				client_stackOverflow(client_fd);
 				break;
@@ -106,6 +114,28 @@ int main(int argc, char* argv[])
 
 	close(server_fd);
 	return 0;
+}
+
+void handle_client(int client_fd)
+{
+	// Small buffer to intentionally demonstrate a stack overflow vulnerability.
+	char buffer[256];
+
+	printf("Client connected.\n");
+
+	ssize_t bytes_received = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+
+	if (bytes_received < 0) {
+		fprintf(stderr, "recv");
+		close(client_fd);
+		return;
+	}
+
+	printf("Received %zd bytes.\n", bytes_received);
+
+	send(client_fd, "Request processed\n", 18, 0);
+
+	close(client_fd);
 }
 
 // Handle client with CWE-121 active
