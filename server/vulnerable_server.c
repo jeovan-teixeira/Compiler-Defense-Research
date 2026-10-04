@@ -116,9 +116,10 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
+
+// Normal handle_client function with no vulnerabilities for testing purposes
 void handle_client(int client_fd)
 {
-	// Small buffer to intentionally demonstrate a stack overflow vulnerability.
 	char buffer[256];
 
 	printf("Client connected.\n");

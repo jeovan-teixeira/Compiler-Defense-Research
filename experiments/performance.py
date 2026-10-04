@@ -55,9 +55,7 @@ def run_test():
 		"runs": len(measurements),
 		"mean_ms": statistics.mean(measurements),
 		"median_ms": statistics.median(measurements),
-		"stdev_ms": ( # Ternary to not run stdev if there are no measurements
-			statistics.stdev(measurements) if len(measurements) > 1 else 0
-		),
+		"stdev_ms": (statistics.stdev(measurements) if len(measurements) > 1 else 0),
 		"min_ms": min(measurements),
 		"max_ms": max(measurements)
 	}
