@@ -229,7 +229,7 @@ void client_heapOverflow(int client_fd)
 	close(client_fd);
 }
 
-// Handle with CWE-680 active
+// Handle with CWE-680 active (This is not a correct implementation; REDO)
 void client_integerOverflow(int client_fd)
 {
 	uint32_t count;
