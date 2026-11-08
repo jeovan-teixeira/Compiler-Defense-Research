@@ -8,7 +8,7 @@ SOURCE = Path("../server/vulnerable_server.c")
 BUILD_DIR = Path("../builds")
 DATA_DIR = Path("../data")
 
-COMPILE_REPETITIONS = 100
+COMPILE_REPETITIONS = 10000
 
 
 CONFIGURATIONS = {

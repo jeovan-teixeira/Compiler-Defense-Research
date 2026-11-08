@@ -6,14 +6,13 @@
 #include <unistd.h>
 
 #define PORT 4444
-#define ITEM_SIZE 16
 int exploit;
 
 void handle_client(int client_fd);
 void client_stackOverflow(int client_fd);
 void client_formatString(int client_fd);
 void client_heapOverflow(int client_fd);
-void client_integerOverflow(int client_fd);
+//void client_integerOverflow(int client_fd);
 
 int main(int argc, char* argv[])
 {
@@ -21,7 +20,7 @@ int main(int argc, char* argv[])
 	if (argv[1] != NULL)
 	{
 		exploit = atoi(argv[1]);
-		exploit = (exploit <= -1  || exploit >= 5) ? 1 : exploit;
+		exploit = (exploit <= -1  || exploit >= 4) ? 1 : exploit;
 	}
 	else	
 	{
@@ -103,10 +102,6 @@ int main(int argc, char* argv[])
 
 			case 3:
 				client_heapOverflow(client_fd);
-				break;
-			
-			case 4:
-				client_integerOverflow(client_fd);
 				break;
 		}
 		
@@ -229,61 +224,26 @@ void client_heapOverflow(int client_fd)
 	close(client_fd);
 }
 
-// Handle with CWE-680 active (This is not a correct implementation; REDO)
-void client_integerOverflow(int client_fd)
+// Scrap Integer Overflow
+/*void client_integerOverflow(int client_fd)
 {
-	uint32_t count;
+	size_t buffer_input;
 
 	printf("Client connected.\n");
 
 	//The client supplies the number of items.
-	ssize_t received = recv(client_fd, &count, sizeof(count), MSG_WAITALL);
-
-	if (received != sizeof(count))
-	{
-		fprintf(stderr, "recv count");
-		close(client_fd);
-		return;
-	}
-
-	printf("Client requested %u items.\n", count);
+	ssize_t received = recv(client_fd, &buffer_input, sizeof(buffer_input), 0);
 
 	// Implementing vulnerability through multiplication causing the integer overflow
-	uint32_t allocation_size = count * ITEM_SIZE;
+	size_t allocation_size = buffer_input * sizeof(int);
 
-	printf("Calculated allocation size: %u bytes.\n", allocation_size);
-
-	char *buffer = malloc(allocation_size);
-
-	if (buffer == NULL && allocation_size != 0)
-	{
-		fprintf(stderr, "malloc");
-		close(client_fd);
-		return;
-	}
-
-	char input[32];
-
-	received = recv(client_fd, input, sizeof(input), 0);
-
-	if (received < 0)
-	{
-		fprintf(stderr, "recv data");
-		free(buffer);
-		close(client_fd);
-		return;
-	}
-
-
-	if (received > 0 && buffer != NULL)
-	{
-		memcpy(buffer, input, received);
-	}
-
-	printf("Received %zd bytes of data.\n", received);
+	int *buffer = malloc(allocation_size);
+	
+	for (size_t i = 0; i < buffer_input; i++)
+		buffer[i] = i;
 
 	send(client_fd, "Request processed\n", 18, 0);
 
 	free(buffer);
 	close(client_fd);
-}
+}*/

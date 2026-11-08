@@ -10,7 +10,7 @@ SERVER_PORT = 4444
 
 REQUEST = b"HELLO\n"
 
-NUM_RUNS = 1000
+NUM_RUNS = 10000
 
 OUTPUT_FILE = "../data/performance_results.csv"
 

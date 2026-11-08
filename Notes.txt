@@ -25,7 +25,6 @@ gcc -O2 -fstack-protector-strong -fPIE -pie -Wl,-z,noexecstack -Wl,-z,relro,-z,n
 Some Attack Commands
 A1: python3 -c 'print("A" * 256)' | nc 169.254.125.100 4444
 A2: echo 'Test %x %x' | nc 169.254.125.100 4444
-A3: python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("<I", 268435456)); sys.stdout.buffer.write(b"AAAA")' | nc 169.254.125.100 4444
 
 Compiler Defense Results:
 Stack Overflow Attack
@@ -54,12 +53,3 @@ Heap Overflow Attack
 - C4_hardened: A1 Attack works; leads to corrupted top size error; program aborts
 - C5_full: A1 Attack fails; program continues to run as normal with no error to be found
 - No_Flags: A1 Attack works; leads to corrupted top size error; program aborts
-
-Integer Overflow Attack
-- C0_baseline: 
-- C1_canary: 
-- C2_nx: 
-- C3_pie_nx: 
-- C4_hardened: 
-- C5_full: 
-- No_Flags: 

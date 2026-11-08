@@ -62,9 +62,9 @@ def analyze_results():
 	baseline_compile = compile_by_config[BASELINE]
 	baseline_performance = performance_by_config[BASELINE]
 
-	baseline_compile_mean = float(baseline_compile["mean_seconds"])
+	baseline_compile_median = float(baseline_compile["median_seconds"])
 	baseline_size = float(baseline_compile["executable_size_bytes"])
-	baseline_latency = float(baseline_performance["mean_ms"])
+	baseline_latency = float(baseline_performance["median_ms"])
 
 	# Sort the configurations
 	configurations = sorted(compile_by_config)
@@ -96,32 +96,32 @@ def analyze_results():
 
 		# Analyze compilation results.
 		if compile_row:
-			compile_mean = float(compile_row["mean_seconds"])
+			compile_median = float(compile_row["median_seconds"])
 			executable_size = float(compile_row["executable_size_bytes"])
 
 			result.update({
-				"compile_mean_seconds": compile_mean,
-				"compile_median_seconds": float(compile_row["median_seconds"]),
+				"compile_mean_seconds": float(compile_row["mean_seconds"]),
+				"compile_median_seconds": compile_median,
 				"compile_stdev_seconds": float(compile_row["stdev_seconds"]),
 				"compile_min_seconds": float(compile_row["min_seconds"]),
 				"compile_max_seconds": float(compile_row["max_seconds"]),
-				"compile_change_percent": percent_change(compile_mean, baseline_compile_mean),
+				"compile_change_percent": percent_change(compile_median, baseline_compile_median),
 				"executable_size_bytes": int(executable_size),
 				"executable_size_change_percent": percent_change(executable_size, baseline_size),
 			})
 
 		# Analyze network performance results.
 		if performance_row:
-			latency_mean = float(performance_row["mean_ms"])
+			latency_median = float(performance_row["median_ms"])
 
 			result.update({
 				"performance_runs": int(performance_row["runs"]),
-				"latency_mean_ms": latency_mean,
-				"latency_median_ms": float(performance_row["median_ms"]),
+				"latency_mean_ms": float(performance_row["mean_ms"]),
+				"latency_median_ms": latency_median,
 				"latency_stdev_ms": float(performance_row["stdev_ms"]),
 				"latency_min_ms": float(performance_row["min_ms"]),
 				"latency_max_ms": float(performance_row["max_ms"]),
-				"latency_change_percent": percent_change(latency_mean, baseline_latency),
+				"latency_change_percent": percent_change(latency_median, baseline_latency),
 			})
 
 		results.append(result)
